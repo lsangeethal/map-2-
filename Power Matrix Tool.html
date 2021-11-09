@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TAL Power Map Tool</title>
+    <!--
+      In the following URLs you may want to replace @latest by @version
+      to prevent unexpected potentionally breaking updates.
+      For example vis-data@1.0.0 instead of vis-data@latest.
+    -->
+    <script SameSite='none' type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script SameSite='none' type="text/javascript" src="https://unpkg.com/xlsx/dist/shim.min.js"></script>
+    <script SameSite='none' type="text/javascript" src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script SameSite='none' src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
+    <script SameSite='none' src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
+<style>
+
+html, body {
+    font-family: 'arial narrow', 'arial', sans-serif;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+h1, h2, h3, p, ul, tr, input, button {
+    font-family: 'arial narrow', 'arial', sans-serif;
+}
+
+    div {
+        border: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+.uploadBar {
+    width: 10%;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    position: relative;
+    float: left;
+    z-index: 10;
+}
+
+
+#header {
+    padding: 10px 0;
+    margin: 10px 0;
+    margin-left: 1%;
+}
+
+h1 {
+    font-size: 150%;
+    margin: 5px 0;
+    font-weight: 1;
+}
+
+h2 {
+    font-size: 100%;
+    margin: 10px 0;
+    font-weight: 1;
+}
+
+    .container {
+        margin-left: 1%;
+    }
+
+    .axis-options {
+        float: left;
+        height: 300px;
+        width: 150px;
+        margin: 0;
+
+        margin-left: 2%;
+        padding: 0;
+        clear: left;
+    }
+
+   p {
+        margin: 0;
+        padding: 0;
+    }
+
+    button {
+        margin: 10px;
+        padding: 2px;
+    }
+
+    input {
+        margin-left: 0;
+        margin-top:6px;
+    }
+
+    #chartArea {
+        position: relative;
+        float: left;
+        margin-left: 10%;
+        margin-top: 5%;
+        padding: 5px;
+        overflow: auto;
+        z-index: 0;
+        width: 1100px;
+    }
+
+    #bubble-chart {
+
+    }
+
+</style>
+
+</head>
+
+<body>
+    <div id="header">
+        <h1>T-H-E—A-R-C-H-I-T-E-C-T-U-R-E—L-O-B-B-Y</h1>
+        <H2>POWER MAPPING TOOL</H2><p>Hover over data points to see names. The radius of each data point represents the amount of 4 values the entity received across all spreadsheet columns. Data points are coloured according to their "group".</p>
+    </div>
+<div class="container">
+    <div class="uploadBar">
+
+        <div class="axis-options" style="height: 60px;">
+        <input type='file' name='xlsxUpload' id='uploadExcel' accept='.xls,.xlsx'>
+        </div>
+
+        <div class="axis-options">
+            <p><b>X-AXIS</b></p>
+            <input type="radio" id="powerX" name="xAxis" value="powerX" checked>
+            <label for="powerX"><b>power</b></label><br>
+
+            <input type="radio" id="publicperceptionX" name="xAxis" value="publicperceptionX">
+            <label for="publicperceptionX">public perception</label><br>
+
+            <input type="radio" id="audiencereachX" name="xAxis" value="audiencereachX">
+            <label for="audiencereachX">audience reach</label><br>
+
+            <input type="radio" id="connectionsX" name="xAxis" value="connectionsX">
+            <label for="connectionsX">connections</label><br>
+
+            <input type="radio" id="domainknowledgeX" name="xAxis" value="domainknowledgeX">
+            <label for="domainknowledgeX">domain knowledge</label><br>
+
+            <input type="radio" id="otherresourcesX" name="xAxis" value="otherresourcesX">
+            <label for="otherresourcesX">other resources</label><br>
+
+            <input type="radio" id="supportX" name="xAxis" value="supportX">
+            <label for="supportX"><b>support</b></label><br>
+
+            <input type="radio" id="publicstatementsX" name="xAxis" value="publicstatementsX">
+            <label for="publicstatementsX">public statements</label><br>
+
+            <input type="radio" id="campaignsX" name="xAxis" value="campaignsX">
+            <label for="campaignsX">campaigns/policies</label><br>
+
+            <input type="radio" id="actionsX" name="xAxis" value="actionsX">
+            <label for="campaactionsXignsX">concrete actions</label><br>
+
+            <input type="radio" id="affiliationsX" name="xAxis" value="affiliationsX">
+            <label for="affiliationsX">affiliations</label><br>
+        </div>
+
+        <div class="axis-options">
+            <p><b>Y-AXIS</b></p>
+            <input type="radio" id="powerY" name="yAxis" value="powerY">
+            <label for="powerY"><b>power</b></label><br>
+
+            <input type="radio" id="publicperceptionY" name="yAxis" value="publicperceptionY">
+            <label for="publicperceptionY">public perception</label><br>
+
+            <input type="radio" id="audiencereachY" name="yAxis" value="audiencereachY">
+            <label for="audiencereachY">audience reach</label><br>
+
+            <input type="radio" id="connectionsY" name="yAxis" value="connectionsY">
+            <label for="connectionsY">connections</label><br>
+
+            <input type="radio" id="domainknowledgeY" name="yAxis" value="domainknowledgeY">
+            <label for="domainknowledgeY">domain knowledge</label><br>
+
+            <input type="radio" id="otherresourcesY" name="yAxis" value="otherresourcesY">
+            <label for="otherresourcesY">other resources</label><br>
+
+            <input type="radio" id="supportY" name="yAxis" value="supportY" checked>
+            <label for="supportY"><b>support</b></label><br>
+
+            <input type="radio" id="publicstatementsY" name="yAxis" value="publicstatementsY">
+            <label for="publicstatementsY">public statements</label><br>
+
+            <input type="radio" id="campaignsY" name="yAxis" value="campaignsY">
+            <label for="campaignsY">campaigns/policies</label><br>
+
+            <input type="radio" id="actionsY" name="yAxis" value="actionsY">
+            <label for="campaactionsYignsY">concrete actions</label><br>
+
+            <input type="radio" id="affiliationsY" name="yAxis" value="affiliationsY">
+            <label for="affiliationsY">affiliations</label><br>
+
+        </div>
+
+        <div class="axis-options" style="height: 70px;">
+            <button type="button" id="generateMap"><B>GENERATE OR REFRESH MAP</B></button>
+        </div>
+
+    </div>
+
+    <div id="chartArea">
+        <canvas id="bubble-chart"></canvas>
+    </div>
+
+</div>
+
+    <script>
+        function random_rgba() {
+            var o = Math.round, r = Math.random, s = 255;
+            return 'rgba(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ',' + .8 + ')';
+        }
+        var Government = random_rgba();
+        var Worker = random_rgba();
+        var Academic = random_rgba();
+        var NFP = random_rgba();
+        var Grassroots_Org = random_rgba();
+        var Institution = random_rgba();
+        var Media = random_rgba();
+        var Political_Org = random_rgba();
+        var Private_Practice = random_rgba();
+        var Union = random_rgba();
+        var Owner = random_rgba();
+        var Other = random_rgba();
+
+    </script>
+
+    <script type='text/javascript'>
+
+
+
+
+        var selectedFile;
+            document
+                .getElementById('uploadExcel')
+                .addEventListener("change", function(event) {
+                selectedFile = event.target.files[0];
+            });
+
+
+        document
+            .getElementById("generateMap")
+            .addEventListener("click", function() {
+
+
+            document.getElementById('bubble-chart').remove();
+
+            var can = document.createElement("canvas");
+            console.log(can);
+            can.setAttribute("id", "bubble-chart");
+            document.getElementById('chartArea').appendChild(can);
+
+            var ctx = document.getElementById('bubble-chart').getContext('2d');
+
+            if (selectedFile) {
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(event) {
+                        var sheetData = event.target.result;
+
+                        var workbook = XLSX.read(sheetData, {
+                            type: "binary"
+                        });
+
+                        var nodesSheetName = workbook.SheetNames[0];
+                        var nodesWorksheet = workbook.Sheets[nodesSheetName];
+                        nodes = XLSX.utils.sheet_to_json(nodesWorksheet);
+
+
+                        Object.keys(nodes).forEach(function(key) {
+                            if($('#powerX').is(':checked')) {
+                                var xData = nodes[key].power;
+                            } else if($('#publicperceptionX').is(':checked')) {
+                                var xData = nodes[key].public_perception;
+                            } else if($('#audiencereachX').is(':checked')) {
+                                var xData = nodes[key].audience_reach;
+                            } else if($('#connectionsX').is(':checked')) {
+                                var xData = nodes[key].connections;
+                            } else if($('#domainknowledgeX').is(':checked')) {
+                                var xData = nodes[key].domain_knowledge;
+                            } else if($('#otherresourcesX').is(':checked')) {
+                                var xData = nodes[key].other_resources;
+                            } else if($('#supportX').is(':checked')) {
+                                var xData = nodes[key].support;
+                            } else if($('#publicstatementsX').is(':checked')) {
+                                var xData = nodes[key].public_statements;
+                            } else if($('#campaignsX').is(':checked')) {
+                                var xData = nodes[key].campaigns_or_policies;
+                            } else if($('#actionsX').is(':checked')) {
+                                var xData = nodes[key].other_concrete_actions;
+                            } else if($('#affiliationsX').is(':checked')) {
+                                var xData = nodes[key].affiliations;
+                            };
+
+                            if($('#powerY').is(':checked')) {
+                                var yData = nodes[key].power;
+                            } else if($('#publicperceptionY').is(':checked')) {
+                                var yData = nodes[key].public_perception;
+                            } else if($('#audiencereachY').is(':checked')) {
+                                var yData = nodes[key].audience_reach;
+                            } else if($('#connectionsY').is(':checked')) {
+                                var yData = nodes[key].connections;
+                            } else if($('#domainknowledgeY').is(':checked')) {
+                                var yData = nodes[key].domain_knowledge;
+                            } else if($('#otherresourcesY').is(':checked')) {
+                                var yData = nodes[key].other_resources;
+                            } else if($('#supportY').is(':checked')) {
+                                var yData = nodes[key].support;
+                            } else if($('#publicstatementsY').is(':checked')) {
+                                var yData = nodes[key].public_statements;
+                            } else if($('#campaignsY').is(':checked')) {
+                                var yData = nodes[key].campaigns_or_policies;
+                            } else if($('#actionsY').is(':checked')) {
+                                var yData = nodes[key].other_concrete_actions;
+                            } else if($('#affiliationsY').is(':checked')) {
+                                var yData = nodes[key].affiliations;
+                            };
+
+                            var rData = nodes[key].count_of_fours * 2
+
+                            nodes[key].data = [{ x: xData, y: yData, r: rData}];
+                            var group = nodes[key].group;
+                            nodes[key].backgroundColor = window[group];
+                        });
+
+
+
+                        var bubbleChart = new Chart(ctx, {
+                            type: 'bubble',
+                            data: {
+                              labels: "The Plot",
+                              datasets: nodes
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+                                aspectRatio: 1.8,
+                                  title: {
+                                    display: false,
+                                    text: 'TAL Power Matrix'
+                                  },
+                                    scales: {
+                                    yAxes: [{
+                                      scaleLabel: {
+                                        display: true,
+                                        labelString: "y"
+                                      },
+                                        ticks: {
+                                            min: 1,
+                                            max: 4,
+                                        }
+                                    }],
+                                    xAxes: [{
+                                      scaleLabel: {
+                                        display: true,
+                                        labelString: "x"
+                                      },
+                                        ticks: {
+                                            min: 1,
+                                            max: 4,
+                                        }
+                                    }]
+                                  },
+                                    legend: {
+                                        display: true,
+                                        labels: {
+                                            boxWidth: 10,
+                                            fontColor: 'black',
+                                        },
+                                        position: 'right',
+                                    },
+                                    plugins: {
+
+                                        zoom: {
+                                            pan: {
+                                                enabled: true,
+                                                mode: 'xy',
+
+                                            },
+                                            zoom: {
+                                                enabled: true,
+                                                drag: false,
+                                                mode: 'xy',
+
+                                            }
+                                        }
+                                    }
+                                }
+                        });
+                    };
+
+                };
+                    fileReader.readAsBinaryString(selectedFile);
+
+            });
+
+
+
+
+
+</script>
+
+</body>
+</html>
